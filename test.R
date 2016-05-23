@@ -90,6 +90,7 @@ table(ldaPredictions, lrSet$Gender)
 # Naive Bayes Classification #
 nbSet <- copy(fullSet)
 
+#http://www.inside-r.org/packages/cran/e1071/docs/naivebayes
 library(e1071)
 plot(as.factor(nbSet[1:100,4])) # See the times a length occurs in the first 100 rows.
 
@@ -105,29 +106,33 @@ table(pred=nbTestPredict, true=nbSet.test$Gender)
 # See the efficiency of the prediction model.
 mean(nbTestPredict==nbSet.test$Gender)
 
-# Function to run the Naive Bayes model multiple times to test the accuracy of the model.
+# Function to run the Naive Bayes model multiple times (on the fakeprofileset) to test the accuracy of the model.
 run_nb_mulitple_times <- function(dataset, train_set_size, n) {
   fraction_correct <- rep(NA, n)
+  
   for (i in 1:n) {
     
-    dataset[,"train"] <- ifelse(runif(nrow(dataset))<train_set_size,1,0)
-    trainColNum <- grep("train",names(dataset))
+    # Add extra column (train) and set it to 1 or 0 (randomly) dividing the dataset by the 'train_set_size'
+    dataset[,"train"] <- ifelse(runif(nrow(dataset))<train_set_size,1,0) 
+    
+    # Get the number of the collumn train -> we use it to remove the column our training en test set.
+    trainColNum <- grep("train",names(dataset)) 
     dataset.train <- dataset[dataset$train==1,-trainColNum]
     dataset.test <- dataset[dataset$train==0,-trainColNum]
     
+    # Now lets use the naiveBayes model and predict our values
     nb_model <- naiveBayes(Gender ~ ., data=dataset.train)
     nb_predict <- predict(nb_model, dataset.test[,-1])
     fraction_correct[i] <- mean(nb_predict==dataset.test$Gender)
-    
   }
   return(fraction_correct)
 }
 
 nb_multiple_times_dataset <- copy(fullSet)
-predict_model_accuracy = run_nb_mulitple_times(nb_multiple_times_dataset, 0.8, 20)
+predict_model_accuracy = run_nb_mulitple_times(nb_multiple_times_dataset, 0.7, 20)
 
 
-#
+#https://eight2late.wordpress.com/2015/11/06/a-gentle-introduction-to-naive-bayes-classification-using-r/
 
 
 
