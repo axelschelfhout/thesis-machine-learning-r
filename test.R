@@ -84,7 +84,53 @@ ldaFit <- lda(Gender~., data=lrSet)
 #summary(ldaFit)
 ldaPredictions <- predict(ldaFit, lrSet[,1:4])$class
 table(ldaPredictions, lrSet$Gender)
+# # # # #
+
+
+# Naive Bayes Classification #
+nbSet <- copy(fullSet)
+
+library(e1071)
+plot(as.factor(nbSet[1:100,4])) # See the times a length occurs in the first 100 rows.
+
+nbTreshold = round(nrow(nbSet)*0.7)
+nbSet.training <- nbSet[1:nbTreshold, ]
+nbSet.test <- nbSet[(nbTreshold+1):nrow(nbSet), ]
+
+nbModel <- naiveBayes(Gender ~ ., data=nbSet.training)
+nbTestPredict <- predict(nbModel, nbSet.test[,-1])
+# Shows the amount of REAL female/male and the PREDICTED (pred) female/male
+table(pred=nbTestPredict, true=nbSet.test$Gender)
+
+# See the efficiency of the prediction model.
+mean(nbTestPredict==nbSet.test$Gender)
+
+# Function to run the Naive Bayes model multiple times to test the accuracy of the model.
+run_nb_mulitple_times <- function(dataset, train_set_size, n) {
+  fraction_correct <- rep(NA, n)
+  for (i in 1:n) {
+    
+    dataset[,"train"] <- ifelse(runif(nrow(dataset))<train_set_size,1,0)
+    trainColNum <- grep("train",names(dataset))
+    dataset.train <- dataset[dataset$train==1,-trainColNum]
+    dataset.test <- dataset[dataset$train==0,-trainColNum]
+    
+    nb_model <- naiveBayes(Gender ~ ., data=dataset.train)
+    nb_predict <- predict(nb_model, dataset.test[,-1])
+    fraction_correct[i] <- mean(nb_predict==dataset.test$Gender)
+    
+  }
+  return(fraction_correct)
+}
+
+nb_multiple_times_dataset <- copy(fullSet)
+predict_model_accuracy = run_nb_mulitple_times(nb_multiple_times_dataset, 0.8, 20)
+
+
 #
+
+
+
 
 
 # -- # # -- # K-Means Clustering # -- # # -- #
@@ -139,11 +185,6 @@ colnames(getGenderFullSet) <- rownames
 train = getGenderFullSet[1:(nrow(getGenderFullSet) * 0.7), 1:length(rownames)]
 # The remaining 30% we are using for evaluation.
 evaluate = getGenderFullSet[((nrow(getGenderFullSet) * 0.7) + 1):nrow(getGenderFullSet), 1:length(rownames)]
-
-
-
-
-
 
 
 
