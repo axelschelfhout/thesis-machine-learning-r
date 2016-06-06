@@ -24,7 +24,8 @@ nbSet.test <- nbSet[(nbTreshold+1):nrow(nbSet), ]
 nbModel <- naiveBayes(Gender ~ ., data=nbSet.training)
 nbTestPredict <- predict(nbModel, nbSet.test[,-1])
 # Shows the amount of REAL female/male and the PREDICTED (pred) female/male
-table(pred=nbTestPredict, true=nbSet.test$Gender)
+table(true=nbSet.test$Gender)
+table(pred=nbTestPredict)
 
 # See the efficiency of the prediction model.
 mean(nbTestPredict==nbSet.test$Gender)

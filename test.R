@@ -115,6 +115,8 @@ run_nb_mulitple_times <- function(dataset, train_set_size, n) {
     # Add extra column (train) and set it to 1 or 0 (randomly) dividing the dataset by the 'train_set_size'
     dataset[,"train"] <- ifelse(runif(nrow(dataset))<train_set_size,1,0) 
     
+    #todo # Check if the dataset isnt the same as a dataset before
+    
     # Get the number of the collumn train -> we use it to remove the column our training en test set.
     trainColNum <- grep("train",names(dataset)) 
     dataset.train <- dataset[dataset$train==1,-trainColNum]
@@ -129,7 +131,7 @@ run_nb_mulitple_times <- function(dataset, train_set_size, n) {
 }
 
 nb_multiple_times_dataset <- copy(fullSet)
-predict_model_accuracy = run_nb_mulitple_times(nb_multiple_times_dataset, 0.7, 20)
+predict_model_accuracy = run_nb_mulitple_times(nb_multiple_times_dataset, 0.7, 10)
 
 
 #https://eight2late.wordpress.com/2015/11/06/a-gentle-introduction-to-naive-bayes-classification-using-r/
