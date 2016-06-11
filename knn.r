@@ -26,8 +26,8 @@ df.test <- data.matrix(df.test)
 df.train_labels <- df.train[,"Gender"]
 df.test_labels <- df.test[,"Gender"]
 
-#try ROC curve
-knn_predict <- knn(train = df.train, test = df.test, cl = df.train_labels, k=5)
+
+knn_predict <- knn(train = df.train[,1:(ncol(df.train)-1)], test = df.test[,1:(ncol(df.test)-1)], cl = df.train_labels, k=5)
 
 CrossTable(x = df.test_labels, y = knn_predict, prop.chisq = FALSE)
 
@@ -55,8 +55,11 @@ run_knn_mulitple_times <- function(dataset, train_set_size, iterations, k) {
     dataset.train <- data.matrix(dataset.train)
     dataset.test <- data.matrix(dataset.test)
     
-    dataset.train_labels <- dataset.train[,"Gender"]
-    dataset.test_labels <- dataset.test[,"Gender"]
+    dataset.train_labels <- dataset.train[,ncol(dataset.train)]
+    dataset.test_labels <- dataset.test[,ncol(dataset.train)]
+    
+    dataset.train <- dataset.train[,1:(ncol(dataset.train)-1)]
+    dataset.test <- dataset.test[,1:(ncol(dataset.test)-1)]
     
     # Now lets use the kNN model and predict our values
     knn_predict <- knn(train = dataset.train, test = dataset.test, cl = dataset.train_labels, k=k)
@@ -68,4 +71,5 @@ run_knn_mulitple_times <- function(dataset, train_set_size, iterations, k) {
 
 knn_multiple_times_dataset <- copy(df)
 predict_model_accuracy = run_knn_mulitple_times(knn_multiple_times_dataset, 0.7, 10, 5)
-
+print(predict_model_accuracy)
+print(mean(predict_model_accuracy))
