@@ -15,25 +15,23 @@ kmdf$Provincie <- NULL
 
 # Calc clusters
 clusterCalcSet <- copy(kmdf)
-clusterCalcSet[,"train"] <- ifelse( runif(nrow(clusterCalcSet)) < 0.7, 1, 0)
-# Split the data up for train/test data
-trainColNum <- grep("train",names(clusterCalcSet)) 
-clustSet <- clusterCalcSet[clusterCalcSet$train==1,-trainColNum]
-clustSet <- data.matrix(clusterCalcSet.train)
+clustSet <- data.matrix(clustSet)
 
 ctrain = clustSet[,-1]
+unscaled <- ctrain
+ctrain <- scale(ctrain)
 
 optimal_cluster_number <- (nrow(ctrain)-1)*sum(apply(ctrain,2,var))
 for(i in 2:20) optimal_cluster_number[i] <- sum(kmeans(ctrain, centers=i)$withinss)
-plot(1:20, optimal_cluster_number/10000, type='b', xlab="Number of clusters", ylab="Within groups sum of squares (/10000)")
-
-
+plot(1:20, optimal_cluster_number, type='b', xlab="Number of clusters", ylab="Within groups sum of squares")
 
 # Numeric everything
 kmdf <- data.matrix(kmdf)
 
+scale(kdmf)
+
 # KMeans
-kc <- kmeans(kmdf, 6)
+kc <- kmeans(kmdf, 10)
 print(kc$center)
 #
 table(df$Gender, kc$cluster)
